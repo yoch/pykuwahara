@@ -1,0 +1,5 @@
+/env
+/build
+/dist
+/src/pykuwahara.egg-info
+/.vscode
