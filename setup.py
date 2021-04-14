@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'pykuwahara',
-    version = '0.1',
+    version = '0.1.2',
     author = 'J. Melka',
     author_email="yoch.melka@gmail.com",
     description = 'Kuwahara filter in python',

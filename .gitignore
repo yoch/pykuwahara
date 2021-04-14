@@ -2,4 +2,5 @@
 /build
 /dist
 /src/pykuwahara.egg-info
+/docs/build
 /.vscode
