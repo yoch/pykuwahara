@@ -1,14 +1,17 @@
 # see: https://packaging.python.org/tutorials/packaging-projects/
 from setuptools import setup, find_packages
 
+with open('README.md') as fp:
+    long_description = fp.read()
+
 setup(
     name = 'pykuwahara',
-    version = '0.1.2',
+    version = '0.2',
     author = 'J. Melka',
     author_email="yoch.melka@gmail.com",
     description = 'Kuwahara filter in python',
-    #long_description=long_description,
-    #long_description_content_type="text/markdown",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     url = 'https://github.com/yoch/pykuwahara',
     license = 'GPL3',
     classifiers=[

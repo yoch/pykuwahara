@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-def kuwahara(orig_img, radius):
+def kuwahara(orig_img, radius, sigma=None, method='mean'):
     """
     Get the image filtered with Kuwahara method.
 
@@ -35,6 +35,14 @@ def kuwahara(orig_img, radius):
     if radius < 1:
         raise ValueError('radius must be greater or equal 1')
 
+    if method not in ('mean', 'gaussian'):
+        raise NotImplementedError('unsupported method %s' % method)
+
+    if method == 'gaussian' and sigma is None:
+        sigma = -1
+        # then computed by OpenCV as : 0.3 * ((ksize - 1) * 0.5 - 1) + 0.8
+        # see: https://docs.opencv.org/master/d4/d86/group__imgproc__filter.html#gac05a120c1ae92a6060dd0db190a61afa
+
     # convert to float64 if necessary for further math computation
     image = orig_img.astype(np.float64, copy=False)
 
@@ -45,13 +53,26 @@ def kuwahara(orig_img, radius):
     avgs = np.empty((4, *image.shape))
     stddevs = np.empty((4, *image.shape))
 
-    kxy = np.ones(radius + 1) / (radius + 1)    # kernelX and kernelY (same)
+    if method == 'mean':
+        kxy = np.ones(radius + 1) / (radius + 1)    # kernelX and kernelY (same)
+    elif method == 'gaussian':
+        kxy = cv2.getGaussianKernel(2 * radius + 1, sigma)
+        kxy /= kxy[radius:].sum()   # normalize the semi-kernels
+        klr = [kxy[:radius+1], kxy[radius:]]
+        kindexes = [(1, 1), (1, 0), (0, 1), (0, 0)]
+
+    # the pixel position for all kernel quadrants
     shift = [(0, 0), (0,  radius), (radius, 0), (radius, radius)]
 
     # Calculation of averages and variances on subwindows
     for k in range(4):
-        cv2.sepFilter2D(image, -1, kxy, kxy, avgs[k], shift[k])
-        cv2.sepFilter2D(squared_img, -1, kxy, kxy, stddevs[k], shift[k])
+        if method == 'mean':
+            kx = ky = kxy
+        elif method == 'gaussian':
+            ix, iy = kindexes[k]
+            kx, ky = klr[ix], klr[iy]
+        cv2.sepFilter2D(image, -1, kx, ky, avgs[k], shift[k])
+        cv2.sepFilter2D(squared_img, -1, kx, ky, stddevs[k], shift[k])
         stddevs[k] = stddevs[k] - avgs[k] ** 2    # variance on subwindow
 
     # Choice of index with minimum variance
