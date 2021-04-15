@@ -14,9 +14,3 @@ Welcome to pykuwahara's documentation!
    :members:
 
 .. autofunction:: pykuwahara.kuwahara
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`

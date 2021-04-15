@@ -6,7 +6,7 @@ with open('README.md') as fp:
 
 setup(
     name = 'pykuwahara',
-    version = '0.2',
+    version = '0.3.1',
     author = 'J. Melka',
     author_email="yoch.melka@gmail.com",
     description = 'Kuwahara filter in python',
