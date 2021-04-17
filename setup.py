@@ -26,6 +26,7 @@ setup(
     ],
     package_dir={"": "src"},
     packages=find_packages(where="src"),
-    install_requires=['numpy', 'opencv-contrib-python'],
     #python_requires=">=3.6",
+    install_requires=['numpy', 'opencv-contrib-python'],
+    tests_require=['pytest'],
 )
