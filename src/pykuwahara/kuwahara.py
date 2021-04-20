@@ -56,7 +56,7 @@ def kuwahara(orig_img, method='mean', radius=3, sigma=None, grayconv=cv2.COLOR_B
         # see: https://docs.opencv.org/master/d4/d86/group__imgproc__filter.html#gac05a120c1ae92a6060dd0db190a61afa
 
     # convert to float32 if necessary for further math computation
-    image = orig_img.astype(np.float64, copy=False)
+    image = orig_img.astype(np.float32, copy=False)
 
     if image_2d is not None:
         image_2d = image_2d.astype(image.dtype, copy=False)
@@ -67,6 +67,7 @@ def kuwahara(orig_img, method='mean', radius=3, sigma=None, grayconv=cv2.COLOR_B
 
     if image.ndim == 3:
         if image_2d is None:
+            # NOTE this doesn't support float64
             image_2d = cv2.cvtColor(orig_img, grayconv).astype(image.dtype, copy=False)
         avgs_2d = np.empty((4, *image.shape[:2]), dtype=image.dtype)
     elif image.ndim == 2:
@@ -79,7 +80,7 @@ def kuwahara(orig_img, method='mean', radius=3, sigma=None, grayconv=cv2.COLOR_B
     if method == 'mean':
         kxy = np.ones(radius + 1, dtype=image.dtype) / (radius + 1)    # kernelX and kernelY (same)
     elif method == 'gaussian':
-        kxy = cv2.getGaussianKernel(2 * radius + 1, sigma, ktype=cv2.CV_64F)
+        kxy = cv2.getGaussianKernel(2 * radius + 1, sigma, ktype=cv2.CV_32F)
         kxy /= kxy[radius:].sum()   # normalize the semi-kernels
         klr = np.array([kxy[:radius+1], kxy[radius:]])
         kindexes = [[1, 1], [1, 0], [0, 1], [0, 0]]
