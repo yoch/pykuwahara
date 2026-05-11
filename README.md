@@ -1,5 +1,7 @@
 # pykuwahara
 
+[![CI](https://github.com/yoch/pykuwahara/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/yoch/pykuwahara/actions/workflows/ci.yml)
+
 Kuwahara filter in Python (NumPy + OpenCV).
 
 > The Kuwahara filter is a non-linear smoothing filter used in image processing for adaptive noise reduction. It is able to apply smoothing on the image while preserving the edges.
