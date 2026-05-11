@@ -1,6 +1,7 @@
 # pykuwahara
 
 [![CI](https://github.com/yoch/pykuwahara/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/yoch/pykuwahara/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/yoch/pykuwahara/graph/badge.svg)](https://codecov.io/gh/yoch/pykuwahara)
 
 Kuwahara filter in Python (NumPy + OpenCV).
 
@@ -25,6 +26,7 @@ Dev / tests:
 ```bash
 pip install -e ".[dev]"
 pytest -q
+pytest -q --cov=pykuwahara --cov-report=term-missing
 ```
 
 Dependencies: `numpy`, `opencv-python-headless`. Do not install another PyPI package that ships its own `cv2` alongside it.

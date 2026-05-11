@@ -31,10 +31,18 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7"]
+dev = ["pytest>=7", "pytest-cov>=4"]
 
 [project.urls]
 Homepage = "https://github.com/yoch/pykuwahara"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.coverage.run]
+branch = true
+source_pkgs = ["pykuwahara"]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true
