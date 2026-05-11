@@ -1,8 +1,68 @@
-/env
-/build
-/dist
-/src/pykuwahara.egg-info
-/docs/build
-/.vscode
+# --- Bytecode & caches ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# --- Packaging / builds ---
+build/
+dist/
+*.egg
+*.egg-info/
+.eggs/
+
+# --- Virtual environments ---
+# Dossiers nommés .venv, .venv-ci, .venv-report, etc. (Git : plusieurs motifs pour couvrir tous les cas)
+.venv/
+/.venv*/
+**/.venv*/
+venv/
+ENV/
+env/
+.virtualenv/
+
+# --- Tests & coverage ---
+.pytest_cache/
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+htmlcov/
+.tox/
+.nox/
+pytestdebug.log
+
+# --- Documentation (Sphinx et assimilés) ---
+docs/_build/
+docs/build/
+
+# --- IDE & éditeurs ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Outils locaux (cache ; verrouiller uv.lock seulement si vous versionnez ce flux) ---
+.uv/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Logs / pip ---
+*.log
+pip-log.txt
+pip-delete-this-directory.txt
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Images : ignorer les JPG sauf les assets versionnés sous examples/ ---
 *.jpg
-**/__pycache__
+!examples/**/*.jpg

@@ -1,0 +1,33 @@
+# Réduit le bruit dans Cursor (explorateur, indexation, recherche).
+
+# Environnements virtuels (tous préfixes .venv…)
+.venv/
+.venv*/
+**/.venv*/
+venv/
+env/
+ENV/
+.virtualenv/
+
+# Build / packaging
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# Caches & outillage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+.uv/
+
+# Documentation générée
+docs/_build/
+docs/build/
