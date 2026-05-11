@@ -117,7 +117,7 @@ cv2.imwrite('photo-kfilt-gaus.jpg', filt2)
 ### Advanced usage
 
 Color image are supported by grayscaling the source image and using the gray channel to calculate the variance.
-The user can provide another channel at his convenience, and alternatively give the right color conversion code (default is `COLOR_BGR2GARY`).
+The user can provide another channel at his convenience, and alternatively give the right color conversion code (default is `COLOR_BGR2GRAY`).
 
 ```
 import cv2

@@ -39,7 +39,7 @@ def kuwahara(orig_img, method='mean', radius=3, sigma=None, grayconv=cv2.COLOR_B
     #       which it itself based on original Matlab code from Luca Balbi, 2007
 
     if orig_img.ndim != 2 and orig_img.ndim != 3:
-        raise TypeError("Incorrect number of dimensions (excepted 2 or 3)")
+        raise TypeError("Incorrect number of dimensions (expected 2 or 3)")
 
     if not isinstance(radius, int):
         raise TypeError('`radius` must be int')
