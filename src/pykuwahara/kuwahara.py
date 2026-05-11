@@ -12,9 +12,10 @@ def kuwahara(orig_img, method='mean', radius=3, sigma=None, grayconv=cv2.COLOR_B
     :type method: "gaussian" | "mean"
     :param radius: the window radius (`winsize = 2 * radius + 1`)
     :type radius: `int`
-    :param sigma: the sigma used if metod is "gaussian", automatically computed by OpenCV when `None`
+    :param sigma: the sigma used if method is "gaussian", automatically computed by OpenCV when `None`
     :type sigma: `float` or `None`
-    :param grayconv: The OpenCV conversion code to extract grayscale image from `orig_img` (default `COLOR_BGR2GRAY`)
+    :param grayconv: OpenCV color conversion code for ``cv2.cvtColor(orig_img, grayconv)`` when ``image_2d``
+        is omitted (3-channel input). Default is ``cv2.COLOR_BGR2GRAY``.
     :type grayconv: `int`
     :param image_2d: The 1-channel image used to compute the variance, if provided instead of `grayconv`
     :type image_2d: `numpy.ndarray`

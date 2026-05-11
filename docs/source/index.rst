@@ -12,5 +12,3 @@ Welcome to pykuwahara's documentation!
 
 .. automodule:: pykuwahara
    :members:
-
-.. autofunction:: pykuwahara.kuwahara
