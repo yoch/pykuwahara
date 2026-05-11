@@ -1,8 +1,17 @@
-import numpy as np
+from typing import Literal, Optional
+
 import cv2
+import numpy as np
 
 
-def kuwahara(orig_img, method='mean', radius=3, sigma=None, grayconv=cv2.COLOR_BGR2GRAY, image_2d=None):
+def kuwahara(
+    orig_img: np.ndarray,
+    method: Literal["mean", "gaussian"] = "mean",
+    radius: int = 3,
+    sigma: Optional[float] = None,
+    grayconv: int = cv2.COLOR_BGR2GRAY,
+    image_2d: Optional[np.ndarray] = None,
+) -> np.ndarray:
     """
     Get the image filtered with Kuwahara method.
 

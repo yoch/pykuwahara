@@ -39,6 +39,9 @@ Homepage = "https://github.com/yoch/pykuwahara"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+pykuwahara = ["py.typed"]
+
 [tool.coverage.run]
 branch = true
 source_pkgs = ["pykuwahara"]
