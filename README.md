@@ -11,7 +11,55 @@ This implementation provide two variants of the filter:
 
 ## Installation
 
-`pip install pykuwahara`
+Requires **Python 3.9+**.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+python -m pip install -U pip
+pip install pykuwahara
+```
+
+For development or running tests:
+
+```bash
+pip install -e ".[dev]"
+pytest -q
+```
+
+### Dependencies
+
+Runtime wheels pulled in by `pip`:
+
+| Package | Role |
+|--------|------|
+| **numpy** | Arrays (`>=1.26,<3`). |
+| [**opencv-python-headless**](https://pypi.org/project/opencv-python-headless/) | OpenCV **without GUI** (no HighGUI). Same main `cv2` API used here (`imgproc`); **no contrib modules**. Smaller and suited to servers and CI than `opencv-python`. Pip selects a wheel compatible with your NumPy line (for example NumPy 1.x pairs with OpenCV 4.11.x; NumPy 2.x uses newer wheels). |
+
+Install **only one** of the PyPI meta-packages that ship `cv2` (`opencv-python`, `opencv-python-headless`, `opencv-contrib-python`, `opencv-contrib-python-headless`). They replace each other; mixing them causes broken or unpredictable installs.
+
+**Breaking change:** releases now depend on **`opencv-python-headless`** instead of `opencv-contrib-python`. This project only needs the standard `cv2` API. If you still have contrib installed, uninstall it and reinstall `pykuwahara` so pip resolves **`opencv-python-headless`**:
+
+```bash
+pip uninstall -y opencv-contrib-python opencv-contrib-python-headless opencv-python opencv-python-headless  # remove any old cv2 wheel
+pip install pykuwahara
+```
+
+### PEP 668 (externally managed environments)
+
+On recent Debian/Ubuntu (and similar), the system Python may refuse global `pip install` with an *externally-managed-environment* error. Use a **virtual environment** or a tool like **[uv](https://github.com/astral-sh/uv)**. Avoid `--break-system-packages` unless you fully accept overwriting distro Python.
+
+### Test matrix (CI)
+
+| Python | NumPy |
+|--------|--------|
+| 3.9 | 1.x (`>=1.26,<2`) |
+| 3.11 | 1.x (`>=1.26,<2`) |
+| 3.13 | 2.x (`>=2,<3`) |
+
+\* CI installs NumPy and OpenCV in one step so pip resolves a compatible pair.
+
+OpenCV is always **`opencv-python-headless`** from package metadata (not a separate CI axis).
 
 ## Usage
 
