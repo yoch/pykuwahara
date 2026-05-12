@@ -1,4 +1,5 @@
 from typing import Literal, Optional
+import warnings
 
 import cv2
 import numpy as np
@@ -77,8 +78,19 @@ def kuwahara(
 
     if image.ndim == 3:
         if image_2d is None:
-            # NOTE this doesn't support float64
-            image_2d = cv2.cvtColor(orig_img, grayconv).astype(image.dtype, copy=False)
+            # OpenCV rejects CV_64F for typical color conversions (e.g. BGR2GRAY).
+            if orig_img.dtype == np.float64:
+                warnings.warn(
+                    "3-channel float64 input without `image_2d`: OpenCV `cv2.cvtColor` does not "
+                    "support CV_64F; converting to float32 for this grayscale step only (grayconv). "
+                    "Pass an explicit 1-channel `image_2d` to control variance guidance or precision.",
+                    UserWarning,
+                    stacklevel=2,
+                )
+                cvt_src = orig_img.astype(np.float32, copy=False)
+            else:
+                cvt_src = orig_img
+            image_2d = cv2.cvtColor(cvt_src, grayconv).astype(image.dtype, copy=False)
         avgs_2d = np.empty((4, *image.shape[:2]), dtype=image.dtype)
     elif image.ndim == 2:
         image_2d = image

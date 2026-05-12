@@ -37,7 +37,7 @@ extensions = [
     "sphinx.ext.autodoc",
 ]
 
-# Quand c’est possible, affiche les valeurs par défaut comme dans le fichier source.
+# When possible, show default values as in the source file.
 autodoc_preserve_defaults = True
 
 # Add any paths that contain templates here, relative to this directory.

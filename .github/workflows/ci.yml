@@ -7,7 +7,7 @@ on:
     branches: [master, main]
   workflow_dispatch:
   schedule:
-    # Hebdo : job golden (deps pinnées) sans encombrer chaque PR
+    # Weekly golden job (pinned deps) without running on every PR
     - cron: "0 6 * * 1"
 
 jobs:

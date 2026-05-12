@@ -1,9 +1,9 @@
 {
   "reference_environment": {
-    "numpy": "2.0.2",
+    "numpy": "2.4.4",
     "opencv-python-headless": "4.10.0.84"
   },
-  "notes": "R\u00e9g\u00e9n\u00e9rer avec tools/regen_golden.py apr\u00e8s avoir pinn\u00e9 NumPy et opencv-python-headless aux versions ci-dessus.",
+  "notes": "Regenerate with tools/regen_golden.py after pinning NumPy and opencv-python-headless to the versions above.",
   "cases": [
     {
       "id": "checker2d_u8_mean_r2",
@@ -44,6 +44,16 @@
       "method": "gaussian",
       "radius": 2,
       "sigma": 1.0
+    },
+    {
+      "id": "stripes3d_u8_mean_r2_image2d_lab_l",
+      "input": "stripes3d_u8.npy",
+      "output": "stripes3d_u8_mean_r2_image2d_lab_l.npy",
+      "method": "mean",
+      "radius": 2,
+      "sigma": null,
+      "image_2d": "stripes3d_u8_image2d_lab_l.npy",
+      "image_2d_source": "BGR2Lab_L"
     }
   ]
 }

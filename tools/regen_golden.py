@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Régénère les entrées/sorties golden et le manifeste sous tests/golden/.
+Regenerate golden inputs/outputs and the manifest under tests/golden/.
 
-À exécuter dans un environnement aux versions **pinnées** (voir manifeste
-`reference_environment`), puis valider le diff avant commit :
+Run in a **pinned** environment (see manifest ``reference_environment``), then review
+the diff before committing:
 
   pip install 'numpy==…' 'opencv-python-headless==…'
   pip install -e .
@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "tests" / "golden" / "data"
 MANIFEST_PATH = ROOT / "tests" / "golden" / "manifest.json"
 
-# Import package depuis le repo (pas besoin d’editable si PYTHONPATH=src)
+# Import package from the repo (editable install optional if PYTHONPATH=src)
 sys.path.insert(0, str(ROOT / "src"))
 from pykuwahara.kuwahara import kuwahara  # noqa: E402
 
@@ -45,10 +45,18 @@ def _stripes_bgr(h: int, w: int) -> np.ndarray:
     return img
 
 
+def _stripes_lab_l_channel() -> np.ndarray:
+    bgr = _stripes_bgr(28, 28)
+    lab = cv2.cvtColor(bgr, cv2.COLOR_BGR2Lab)
+    l_ch, _a, _b = cv2.split(lab)
+    return l_ch
+
+
 INPUT_BUILDERS = {
     "checker2d_u8.npy": lambda: _checker_2d(32, 32),
     "gradient2d_f32.npy": lambda: _gradient_2d(24, 32),
     "stripes3d_u8.npy": lambda: _stripes_bgr(28, 28),
+    "stripes3d_u8_image2d_lab_l.npy": _stripes_lab_l_channel,
 }
 
 
@@ -94,6 +102,16 @@ def _cases() -> list[dict]:
             "radius": 2,
             "sigma": 1.0,
         },
+        {
+            "id": "stripes3d_u8_mean_r2_image2d_lab_l",
+            "input": "stripes3d_u8.npy",
+            "output": "stripes3d_u8_mean_r2_image2d_lab_l.npy",
+            "method": "mean",
+            "radius": 2,
+            "sigma": None,
+            "image_2d": "stripes3d_u8_image2d_lab_l.npy",
+            "image_2d_source": "BGR2Lab_L",
+        },
     ]
 
 
@@ -111,12 +129,10 @@ def main() -> None:
         inp_path = DATA_DIR / case["input"]
         img = np.load(inp_path, allow_pickle=False)
         sigma = case["sigma"]
-        out = kuwahara(
-            img,
-            method=case["method"],
-            radius=case["radius"],
-            sigma=sigma,
-        )
+        kw = dict(method=case["method"], radius=case["radius"], sigma=sigma)
+        if case.get("image_2d"):
+            kw["image_2d"] = np.load(DATA_DIR / case["image_2d"], allow_pickle=False)
+        out = kuwahara(img, **kw)
         out_path = DATA_DIR / case["output"]
         np.save(out_path, out, allow_pickle=False)
         print("wrote", out_path.relative_to(ROOT))
@@ -132,8 +148,8 @@ def main() -> None:
             "opencv-python-headless": opencv_ver,
         },
         "notes": (
-            "Régénérer avec tools/regen_golden.py après avoir pinné NumPy et "
-            "opencv-python-headless aux versions ci-dessus."
+            "Regenerate with tools/regen_golden.py after pinning NumPy and "
+            "opencv-python-headless to the versions above."
         ),
         "cases": cases,
     }

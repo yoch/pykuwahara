@@ -36,7 +36,7 @@ golden = ["pytest>=7", "scikit-image>=0.22"]
 
 [tool.pytest.ini_options]
 markers = [
-    "golden: régression sur fichiers golden + SSIM/PSNR (job CI dédié, deps pinnées)",
+    "golden: golden-file regression + SSIM/PSNR (dedicated CI job, pinned deps)",
 ]
 testpaths = ["tests"]
 
