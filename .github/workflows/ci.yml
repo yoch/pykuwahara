@@ -5,6 +5,10 @@ on:
     branches: [master, main]
   pull_request:
     branches: [master, main]
+  workflow_dispatch:
+  schedule:
+    # Hebdo : job golden (deps pinnées) sans encombrer chaque PR
+    - cron: "0 6 * * 1"
 
 jobs:
   test:
@@ -38,7 +42,7 @@ jobs:
           python -m pip install "${{ matrix.numpy-spec }}" "opencv-python-headless>=4.8"
           python -m pip install pytest
           python -m pip install --no-deps -e .
-          python -m pytest -q
+          python -m pytest -q -m "not golden"
 
   build:
     runs-on: ubuntu-latest
@@ -80,7 +84,7 @@ jobs:
           python -m pip install -U pip setuptools wheel
           python -m pip install "numpy>=1.26,<3" "opencv-python-headless>=4.8" pytest pytest-cov
           python -m pip install --no-deps -e .
-          python -m pytest tests/ -q --cov=pykuwahara --cov-report=xml --cov-report=term-missing
+          python -m pytest tests/ -q -m "not golden" --cov=pykuwahara --cov-report=xml --cov-report=term-missing
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -88,3 +92,36 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml
           fail_ci_if_error: false
+
+  golden:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned deps and golden extras
+        run: |
+          python -m pip install -U pip setuptools wheel
+          python -m pip install "numpy==2.0.2" "opencv-python-headless==4.10.0.84"
+          python -m pip install -e ".[golden]"
+
+      - name: Golden regression (strict + SSIM/PSNR ROI)
+        env:
+          CI: "true"
+          GOLDEN_STRICT: "1"
+        run: python -m pytest tests/test_golden_regression.py -v
+
+      - name: Upload golden failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failure
+          path: golden_failure/
+          if-no-files-found: ignore

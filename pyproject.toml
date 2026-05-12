@@ -32,6 +32,13 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=7", "pytest-cov>=4"]
+golden = ["pytest>=7", "scikit-image>=0.22"]
+
+[tool.pytest.ini_options]
+markers = [
+    "golden: régression sur fichiers golden + SSIM/PSNR (job CI dédié, deps pinnées)",
+]
+testpaths = ["tests"]
 
 [project.urls]
 Homepage = "https://github.com/yoch/pykuwahara"
