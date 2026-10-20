@@ -1,6 +1,6 @@
 {
   "reference_environment": {
-    "numpy": "2.4.4",
+    "numpy": "2.0.2",
     "opencv-python-headless": "4.10.0.84"
   },
   "notes": "Regenerate with tools/regen_golden.py after pinning NumPy and opencv-python-headless to the versions above.",

@@ -24,6 +24,7 @@ by default to keep CI light.
 """
 from __future__ import annotations
 
+import importlib.metadata
 import json
 import os
 from pathlib import Path
@@ -94,6 +95,16 @@ def test_manifest_has_reference_environment(manifest: dict) -> None:
     assert isinstance(ref, dict)
     assert "numpy" in ref
     assert "opencv-python-headless" in ref
+
+
+@pytest.mark.skipif(
+    os.environ.get("GOLDEN_STRICT") != "1",
+    reason="Installed versions only need to match the manifest in strict mode (golden CI job).",
+)
+def test_manifest_reference_environment_matches_installed(manifest: dict) -> None:
+    ref = manifest["reference_environment"]
+    installed = {name: importlib.metadata.version(name) for name in ref}
+    assert installed == ref
 
 
 @pytest.mark.parametrize("case", _GOLDEN_CASES, ids=lambda c: c["id"])

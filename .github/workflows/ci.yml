@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [master, main]
+    branches: [master, main, dev]
   pull_request:
-    branches: [master, main]
+    branches: [master, main, dev]
   workflow_dispatch:
   schedule:
-    # Weekly golden job (pinned deps) without running on every PR
+    # Weekly run (golden job with pinned deps also runs on every push/PR)
     - cron: "0 6 * * 1"
 
 jobs:
@@ -95,7 +95,6 @@ jobs:
 
   golden:
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
     steps:

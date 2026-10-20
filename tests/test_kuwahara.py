@@ -25,7 +25,7 @@ Controlled degradation (prove the tests "bite"):
 
 Manual checklist (throwaway branch, **do not merge**) in ``src/pykuwahara/kuwahara.py``:
 
-- Replace ``np.argmin(stddevs, axis=0)`` with ``np.argmax``: tests
+- Replace ``np.argmin(variances, axis=0)`` with ``np.argmax``: tests
   ``classic_kuwahara_quadrant_output_within_local_window_bounds`` may **still pass**
   (any quadrant mean stays inside the patch min/max envelope); **golden** may fail.
   To break bounds, use the automated ``degradation_mutation_biased_output_*`` test or
@@ -135,7 +135,7 @@ def test_filter_contract_kuwahara_with_image_2d_preserves_shape_and_dtype(image,
 def test_filter_contract_kuwahara_float64_3d_grayconv_warns_and_runs():
     """
     3D float64 without ``image_2d``: OpenCV rejects CV_64F for ``cvtColor``; the code
-    converts to float32 for grayscale only and emits ``UserWarning``.
+    converts to float32 for grayscale only (filtering stays float64) and emits ``UserWarning``.
     """
     img = np.full((10, 12, 3), 0.5, dtype=np.float64)
     with pytest.warns(UserWarning, match="float64"):
@@ -185,8 +185,61 @@ def test_filter_contract_kuwahara_rejects_bad_ndim(image, method):
 
 @pytest.mark.parametrize("image", images[:1])
 def test_filter_contract_kuwahara_rejects_unknown_method(image):
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(ValueError):
         kuwahara(image, method="nonexistent")
+
+
+@pytest.mark.parametrize("image", images[:1])
+def test_filter_contract_kuwahara_radius_rejects_bool(image):
+    with pytest.raises(TypeError):
+        kuwahara(image, radius=True)
+
+
+@pytest.mark.parametrize("radius", [np.int32(3), np.int64(3)])
+def test_filter_contract_kuwahara_radius_accepts_numpy_integers(radius):
+    assert np.array_equal(kuwahara(img_3c_uint, radius=radius), kuwahara(img_3c_uint, radius=3))
+
+
+@pytest.mark.parametrize("image", images)
+@pytest.mark.parametrize("shape_fn", [
+    lambda h, w: (2 * h, 2 * w),
+    lambda h, w: (h, w, 3),
+    lambda h, w: (h, w, 1),
+    lambda h, w: (h,),
+])
+def test_filter_contract_kuwahara_rejects_bad_image_2d_shape(image, shape_fn):
+    guide = np.zeros(shape_fn(*image.shape[:2]), dtype=image.dtype)
+    with pytest.raises(ValueError, match="image_2d"):
+        kuwahara(image, radius=2, image_2d=guide)
+
+
+@pytest.mark.parametrize("image", images_3c)
+@pytest.mark.parametrize("grayconv", [cv2.COLOR_BGR2HSV, cv2.COLOR_BGR2LAB, cv2.COLOR_BGR2BGRA])
+def test_filter_contract_kuwahara_rejects_multichannel_grayconv(image, grayconv):
+    with pytest.raises(ValueError, match="grayconv"):
+        kuwahara(image, radius=2, grayconv=grayconv)
+
+
+@pytest.mark.parametrize("dtype", [np.int8, np.int16, np.uint16, np.int32, np.int64, np.float16, ">f8", ">u2"])
+@pytest.mark.parametrize("method", ["mean", "gaussian"])
+def test_filter_contract_kuwahara_3d_dtypes_without_image_2d(dtype, method):
+    img = img_3c_uint[:20, :24].astype(dtype)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)  # float64 grayconv warning
+        out = kuwahara(img, method=method, radius=2)
+    assert out.shape == img.shape
+    assert out.dtype == img.dtype
+    assert _quadrant_local_bounds_satisfied(img.astype(np.float64), out.astype(np.float64), 2)
+
+
+@pytest.mark.parametrize("image", images_1c)
+@pytest.mark.parametrize("method", ["mean", "gaussian"])
+def test_filter_contract_kuwahara_2d_uses_image_2d(image, method):
+    guide = np.ascontiguousarray(image.T[::-1])   # unrelated to the image, same shape
+    out = kuwahara(image, method=method, radius=2, image_2d=guide)
+    out_3c = kuwahara(np.dstack([image] * 3), method=method, radius=2, image_2d=guide)
+    assert np.array_equal(out, out_3c[..., 0])
+    assert not np.array_equal(out, kuwahara(image, method=method, radius=2))
 
 
 # ---------------------------------------------------------------------------
@@ -236,6 +289,53 @@ def test_classic_kuwahara_quadrant_output_within_local_window_bounds(method, rad
     img = rng.integers(0, 256, size=(h, w, 3), dtype=np.uint8)
     out = kuwahara(img, method=method, radius=radius)
     assert _quadrant_local_bounds_satisfied(img, out, radius)
+
+
+def _naive_kuwahara_interior(img, guide, method, radius, sigma):
+    """Independent reference (explicit loops over the 4 quadrants), interior pixels only."""
+    r = radius
+    if method == "mean":
+        before = after = np.full(r + 1, 1.0 / (r + 1))
+    else:
+        g = cv2.getGaussianKernel(2 * r + 1, -1 if sigma is None else sigma, ktype=cv2.CV_64F).ravel()
+        before = g[: r + 1] / g[: r + 1].sum()   # weights for offsets -r..0
+        after = g[r:] / g[r:].sum()             # weights for offsets 0..r
+    halves = [(-r, before), (0, after)]
+    h, w = guide.shape
+    out = np.empty((h - 2 * r, w - 2 * r) + img.shape[2:])
+    for i in range(r, h - r):
+        for j in range(r, w - r):
+            best = None
+            for di, wy in halves:
+                for dj, wx in halves:
+                    weights = np.outer(wy, wx)
+                    rows = slice(i + di, i + di + r + 1)
+                    cols = slice(j + dj, j + dj + r + 1)
+                    gp = guide[rows, cols]
+                    var = np.sum(weights * gp**2) - np.sum(weights * gp) ** 2
+                    if best is None or var < best[0]:
+                        p = img[rows, cols]
+                        mean = np.tensordot(weights, p, axes=([0, 1], [0, 1]))
+                        best = (var, mean)
+            out[i - r, j - r] = best[1]
+    return out
+
+
+@pytest.mark.parametrize("method,sigma", [("mean", None), ("gaussian", None), ("gaussian", 1.3)])
+@pytest.mark.parametrize("radius", [1, 2])
+@pytest.mark.parametrize("case", ["2d", "2d_guide", "3d_guide"])
+def test_classic_kuwahara_quadrant_matches_naive_reference_float64(method, sigma, radius, case):
+    """Matches an independent implementation, at float64 precision (interior only:
+    on the borders, reflected quadrants can have exactly equal variances)."""
+    rng = np.random.default_rng(2024)
+    shape = (12, 13, 3) if case == "3d_guide" else (12, 13)
+    img = rng.random(shape)
+    guide = rng.random((12, 13)) if case.endswith("guide") else None
+    out = kuwahara(img, method=method, radius=radius, sigma=sigma, image_2d=guide)
+    assert out.dtype == np.float64
+    ref = _naive_kuwahara_interior(img, img if guide is None else guide, method, radius, sigma)
+    r = radius
+    np.testing.assert_allclose(out[r:-r, r:-r], ref, rtol=0, atol=1e-9)
 
 
 # ---------------------------------------------------------------------------

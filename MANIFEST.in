@@ -1,0 +1,2 @@
+recursive-include tests/golden *.json *.npy
+include tools/regen_golden.py

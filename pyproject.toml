@@ -1,13 +1,14 @@
 [build-system]
-requires = ["setuptools>=61", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pykuwahara"
-version = "0.4.0"
+version = "0.5.0"
 description = "Kuwahara filter in python"
 readme = "README.md"
-license = "GPL-3.0"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
 requires-python = ">=3.9"
 authors = [{ name = "J. Melka", email = "yoch.melka@gmail.com" }]
 keywords = ["kuwahara", "image-processing", "opencv", "numpy"]
