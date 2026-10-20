@@ -5,13 +5,24 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pykuwahara"
 version = "0.5.0"
-description = "Kuwahara filter in python"
+description = "Kuwahara filter for Python (NumPy + OpenCV): edge-preserving smoothing and painterly effect"
 readme = "README.md"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
 requires-python = ">=3.9"
 authors = [{ name = "J. Melka", email = "yoch.melka@gmail.com" }]
-keywords = ["kuwahara", "image-processing", "opencv", "numpy"]
+keywords = [
+    "kuwahara",
+    "image-processing",
+    "opencv",
+    "numpy",
+    "kuwahara-filter",
+    "edge-preserving",
+    "smoothing",
+    "denoising",
+    "painterly",
+    "computer-vision",
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -43,6 +54,8 @@ testpaths = ["tests"]
 
 [project.urls]
 Homepage = "https://github.com/yoch/pykuwahara"
+Repository = "https://github.com/yoch/pykuwahara"
+Issues = "https://github.com/yoch/pykuwahara/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

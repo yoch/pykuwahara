@@ -2,6 +2,9 @@
 
 [![CI](https://github.com/yoch/pykuwahara/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/yoch/pykuwahara/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/yoch/pykuwahara/graph/badge.svg)](https://codecov.io/gh/yoch/pykuwahara)
+[![PyPI](https://img.shields.io/pypi/v/pykuwahara)](https://pypi.org/project/pykuwahara/)
+[![Python versions](https://img.shields.io/pypi/pyversions/pykuwahara)](https://pypi.org/project/pykuwahara/)
+[![License](https://img.shields.io/pypi/l/pykuwahara)](https://github.com/yoch/pykuwahara/blob/main/LICENSE)
 
 Kuwahara filter in Python (NumPy + OpenCV).
 
@@ -49,11 +52,11 @@ cv2.imwrite('lena-kfilt-gaus.jpg', filt2)
 ```
 
 #### Original image
-![Original image](/examples/lena_std.jpg)
+![Original image](https://raw.githubusercontent.com/yoch/pykuwahara/main/examples/lena_std.jpg)
 #### Filtered with Kuwahara (mean)
-![Mean method](/examples/lena-kfilt-mean.jpg)
+![Mean method](https://raw.githubusercontent.com/yoch/pykuwahara/main/examples/lena-kfilt-mean.jpg)
 #### Filtered with Kuwahara (gaussian)
-![Gaussian method](/examples/lena-kfilt-gaus.jpg)
+![Gaussian method](https://raw.githubusercontent.com/yoch/pykuwahara/main/examples/lena-kfilt-gaus.jpg)
 
 
 ### Painting-style effect
@@ -72,11 +75,11 @@ cv2.imwrite('photo-kfilt-gaus.jpg', filt2)
 ```
 
 #### Original image (source: [wikipedia](https://en.wikipedia.org/wiki/File:Kuwahara_creates_artistic_photo.jpg))
-![Original image](/examples/photo.jpg)
+![Original image](https://raw.githubusercontent.com/yoch/pykuwahara/main/examples/photo.jpg)
 #### Filtered with Kuwahara (mean)
-![Mean method](/examples/photo-kfilt-mean.jpg)
+![Mean method](https://raw.githubusercontent.com/yoch/pykuwahara/main/examples/photo-kfilt-mean.jpg)
 #### Filtered with Kuwahara (gaussian)
-![Gaussian method](/examples/photo-kfilt-gaus.jpg)
+![Gaussian method](https://raw.githubusercontent.com/yoch/pykuwahara/main/examples/photo-kfilt-gaus.jpg)
 
 
 ### Colour: variance channel
@@ -104,8 +107,8 @@ cv2.imwrite('selfie-kfilt-gaus2.jpg', filt2 * 255)
 ```
 
 #### Original image ([source](https://stackoverflow.com/questions/47017741/image-filter-to-cartoonize-and-colorize#47087756))
-![Original image](/examples/selfie.jpg)
+![Original image](https://raw.githubusercontent.com/yoch/pykuwahara/main/examples/selfie.jpg)
 #### Filtered with Kuwahara on L (Lab)
-![Lab](/examples/selfie-kfilt-gaus1.jpg)
+![Lab](https://raw.githubusercontent.com/yoch/pykuwahara/main/examples/selfie-kfilt-gaus1.jpg)
 #### Filtered with Kuwahara on V (HSV)
-![HSV](/examples/selfie-kfilt-gaus2.jpg)
+![HSV](https://raw.githubusercontent.com/yoch/pykuwahara/main/examples/selfie-kfilt-gaus2.jpg)
