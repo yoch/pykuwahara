@@ -9,8 +9,11 @@ Documented thresholds:
   - SSIM on ROI: >= 0.995 (matches pinned reference environment).
   - PSNR on ROI: >= 40 dB (uint8: data_range=255 ; float32: data_range=1.0).
 
-``GOLDEN_STRICT=1`` (golden CI job): strict equality on the full image (uint8) or
-``allclose`` (float32) in addition to the metrics.
+``GOLDEN_STRICT=1`` (golden CI job): on the full image, at most ±1 (uint8: truncation of
+exactly-integer means depends on float32 rounding) or ``allclose`` (float32), in addition
+to the metrics, and the installed versions must match the manifest. Golden inputs are
+tie-free (checked by ``tools/regen_golden.py``), so the selected quadrants do not depend
+on the CPU.
 
 Noise degradation — prove SSIM reacts to a **local** perturbation:
 
@@ -132,7 +135,9 @@ def test_golden_case_ssim_psnr_and_optional_strict(case: dict) -> None:
         assert psnr >= PSNR_MIN_ROI, f"{cid}: PSNR ROI {psnr} < {PSNR_MIN_ROI}"
         if os.environ.get("GOLDEN_STRICT") == "1":
             if actual.dtype == np.uint8:
-                assert np.array_equal(actual, expected), cid
+                # ±1: truncation of a mean that is exactly an integer depends on float32 rounding
+                diff = np.abs(actual.astype(np.int16) - expected.astype(np.int16))
+                assert diff.max() <= 1, cid
             else:
                 np.testing.assert_allclose(actual, expected, rtol=1e-6, atol=1e-6, err_msg=cid)
     except AssertionError:
